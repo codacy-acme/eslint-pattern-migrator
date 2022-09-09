@@ -15,7 +15,9 @@ ESLINT_8_PREFIX = 'ESLint8_'
 
 connection = psycopg2.connect(
     host="localhost",
-    database="analysis")
+    database="analysis",
+    user="#####",
+    password="#####")
 
 def list_eslint7_active_patterns():
     patterns = []
@@ -89,9 +91,11 @@ def main():
     eslint8_patterns_to_enable = []
     for pattern in eslint7_active_patterns:
         eslint8_equivalent = first([x["id"] for x in eslint8_patterns if x["internalId"] == pattern["internalId"] ])
-        eslint8_patterns_to_enable.append((eslint8_equivalent, pattern['parameters'], pattern['projectId']))
+        if eslint8_equivalent is not None:
+            eslint8_patterns_to_enable.append((eslint8_equivalent, pattern['parameters'], pattern['projectId']))
     delete_eslint8_active_patterns()
     enable_eslint8_patterns(eslint8_patterns_to_enable)
+    connection.commit()
 
 
 main()
